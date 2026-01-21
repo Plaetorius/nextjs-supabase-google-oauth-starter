@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
+// Cache bust: v4 - Manual session serialization
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
@@ -17,8 +18,11 @@ export async function GET(request: Request) {
 
   if (code) {
     const cookieStore = await cookies()
+    
+    // Create response early so we can set cookies on it
     const response = NextResponse.redirect(`${origin}${next}`)
     
+    // Create Supabase client with response cookie setting
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
@@ -28,6 +32,7 @@ export async function GET(request: Request) {
             return cookieStore.getAll()
           },
           setAll(cookiesToSet) {
+            // Set on response immediately
             cookiesToSet.forEach(({ name, value, options }) => {
               response.cookies.set(name, value, {
                 ...options,
@@ -35,10 +40,13 @@ export async function GET(request: Request) {
                 sameSite: (options?.sameSite as 'lax' | 'strict' | 'none') || 'lax',
                 httpOnly: options?.httpOnly || false,
                 secure: options?.secure || false,
-                maxAge: options?.maxAge || 60 * 60 * 24 * 7,
+                maxAge: options?.maxAge || 60 * 60 * 24 * 7, // 7 days default
               })
             })
           },
+        },
+        cookieOptions: {
+          name: "sb-auth-token",
         },
       }
     )
@@ -46,7 +54,7 @@ export async function GET(request: Request) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
     
     if (!error && data.session) {
-      // Manually serialize and set session cookies to work around Next.js 16 + Turbopack timing issue
+      // Double-check: manually set session as a single cookie if needed
       const sessionData = JSON.stringify({
         access_token: data.session.access_token,
         refresh_token: data.session.refresh_token,
@@ -56,12 +64,13 @@ export async function GET(request: Request) {
         user: data.session.user,
       })
       
+      // Chunk the session data (Supabase does this automatically but let's be explicit)
       const CHUNK_SIZE = 3180
       const chunks = Math.ceil(sessionData.length / CHUNK_SIZE)
       
       for (let i = 0; i < chunks; i++) {
         const chunk = sessionData.substring(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE)
-        const cookieName = chunks > 1 ? `sb-127-auth-token.${i}` : 'sb-127-auth-token'
+        const cookieName = chunks > 1 ? `sb-auth-token.${i}` : 'sb-auth-token'
         
         response.cookies.set(cookieName, chunk, {
           path: '/',
@@ -73,8 +82,10 @@ export async function GET(request: Request) {
       }
       
       return response
+    } else {
+      console.error("❌ Error exchanging code for session:", error)
     }
   }
 
-  return NextResponse.redirect(`${origin}/auth/error`)
+  return NextResponse.redirect(`${origin}/auth/auth-code-error`)
 }

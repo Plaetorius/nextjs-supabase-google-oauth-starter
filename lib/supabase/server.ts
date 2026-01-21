@@ -29,6 +29,9 @@ export async function createClient() {
           }
         },
       },
+      cookieOptions: {
+        name: "sb-auth-token",
+      },
     },
   );
 }

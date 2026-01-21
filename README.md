@@ -54,7 +54,7 @@ supabase start
 This will output your local Supabase credentials. You'll need:
 
 - `API URL` (usually `http://127.0.0.1:54321`)
-- `anon key`
+- `publishable key`
 
 ### 3. Set up Google OAuth
 

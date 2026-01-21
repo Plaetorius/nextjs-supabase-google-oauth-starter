@@ -130,10 +130,10 @@ Edit `supabase/config.toml`:
 
 ```toml
 [auth]
-site_url = "http://127.0.0.1:3000"
+site_url = "http://localhost:3000"
 additional_redirect_urls = [
+  "http://localhost:3000/auth/callback",
   "http://127.0.0.1:3000/auth/callback",
-  "http://localhost:3000/auth/callback"
 ]
 
 [auth.external.google]
@@ -169,21 +169,15 @@ SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET=your_google_client_secret_here
 supabase stop
 supabase start
 
-# Run Next.js dev server on 127.0.0.1
-pnpm dev --hostname 127.0.0.1
+# Run Next.js dev server 
+pnpm dev
 ```
 
 ### 6. Open your browser
 
-Navigate to `http://127.0.0.1:3000` and click **Continue with Google**!
+Navigate to `http://localhost:3000` and click **Continue with Google**!
 
 ## Important Notes
-
-### Why 127.0.0.1 instead of localhost?
-
-Browsers treat `localhost` and `127.0.0.1` as different origins. This causes
-cookie mismatches during OAuth. Always use `127.0.0.1:3000` for local
-development.
 
 ### Next.js 16 + Turbopack Cookie Handling
 
@@ -234,7 +228,7 @@ Edit `app/auth/action.ts`:
 export const signInWithGoogle = async () => {
   // ...
   const redirectUrl = process.env.NODE_ENV === "development"
-    ? "http://127.0.0.1:3000/auth/callback" // Change this
+    ? "http://localhost:3000/auth/callback" // Change this
     : "https://your-production-domain.com/auth/callback";
   // ...
 };
@@ -284,7 +278,7 @@ if (
 4. Update `app/auth/action.ts` to use your production domain:
    ```typescript
    const redirectUrl = process.env.NODE_ENV === "development"
-     ? "http://127.0.0.1:3000/auth/callback"
+     ? "http://localhost:3000/auth/callback"
      : "https://yourdomain.com/auth/callback"; // Your production domain
    ```
 5. Update Google OAuth redirect URIs to include:
@@ -312,15 +306,15 @@ CLI:
 
 ### Cookies not persisting
 
-- Make sure you're accessing the app via `http://127.0.0.1:3000`, not
-  `localhost:3000`
-- Clear all cookies for both `127.0.0.1:3000` and `localhost:3000`
+- Make sure you're accessing the app via `http://localhost:3000`, not
+  `127.0.0.1:3000`
+- Clear all cookies for both `localhost:3000` and `127.0.0.1:3000`
 - Restart both Supabase and the Next.js dev server
 
 ### Google OAuth redirect error
 
 - Verify the redirect URIs in Google Cloud Console match exactly:
-  - `http://127.0.0.1:54321/auth/v1/callback` (for Supabase Auth)
+  - `http://localhost:54321/auth/v1/callback` (for Supabase Auth)
   - NOT your app's callback route
 - Check that `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET` is set in
   `supabase/.env`
@@ -330,7 +324,6 @@ CLI:
 This means the OAuth callback route isn't setting cookies correctly. Make sure:
 
 - You're using the custom callback handler in `app/auth/callback/route.ts`
-- The dev server is running with `--hostname 127.0.0.1`
 - You've restarted the dev server after making changes
 
 ## Resources

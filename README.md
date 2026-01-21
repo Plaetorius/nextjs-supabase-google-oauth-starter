@@ -26,7 +26,7 @@ the [Deployment](#deployment) section below.
 ### 1. Clone the repository
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/Plaetorius/nextjs-supabase-google-oauth-starter
 cd nextjs-supabase-google-oauth-starter
 pnpm install
 ```

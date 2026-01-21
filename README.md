@@ -153,7 +153,7 @@ Create `.env.local`:
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_anon_key_here
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_publishable_key_here
 ```
 
 Create `supabase/.env` (for Supabase local):
@@ -228,7 +228,7 @@ Edit `app/auth/action.ts`:
 export const signInWithGoogle = async () => {
   // ...
   const redirectUrl = process.env.NODE_ENV === "development"
-    ? "http://localhost:3000/auth/callback" // Change this
+    ? "http://localhost:3000/auth/callback"
     : "https://your-production-domain.com/auth/callback";
   // ...
 };
@@ -273,7 +273,7 @@ if (
 3. Set environment variables in Vercel project settings:
    ```
    NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
-   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_production_anon_key
+   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_production_publishable_key
    ```
 4. Update `app/auth/action.ts` to use your production domain:
    ```typescript
@@ -317,7 +317,7 @@ CLI:
   - `http://localhost:54321/auth/v1/callback` (for Supabase Auth)
   - NOT your app's callback route
 - Check that `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET` is set in
-  `supabase/.env`
+  `.env.local`
 
 ### Session not found after sign-in
 

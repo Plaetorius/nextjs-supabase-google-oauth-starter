@@ -77,17 +77,21 @@ This will output your local Supabase credentials. You'll need:
 
 #### Local Development URIs
 
-7. Configure **Authorized JavaScript origins**
+1. Configure **Authorized JavaScript origins**
    ([console.cloud.google.com/auth/clients](https://console.cloud.google.com/auth/clients)):
-   ```
+
+   ```txt
    http://localhost:3000
    http://127.0.0.1:3000
    ```
-8. Configure **Authorized redirect URIs**:
-   ```
+
+2. Configure **Authorized redirect URIs**:
+
+   ```txt
    http://localhost:54321/auth/v1/callback
    http://127.0.0.1:54321/auth/v1/callback
    ```
+
    ⚠️ **Important**: These URIs point to your **Supabase Auth server** (port
    54321), not your Next.js app (port 3000)
 
@@ -97,13 +101,13 @@ When you deploy to production, **add** these URIs to the same OAuth client:
 
 **Authorized JavaScript origins:**
 
-```
+```txt
 https://yourdomain.com
 ```
 
 **Authorized redirect URIs:**
 
-```
+```txt
 https://your-project-ref.supabase.co/auth/v1/callback
 ```
 
@@ -112,14 +116,14 @@ https://your-project-ref.supabase.co/auth/v1/callback
 
 #### Configure OAuth Scopes
 
-9. Configure **OAuth Scopes**
+1. Configure **OAuth Scopes**
    ([console.cloud.google.com/auth/scopes](https://console.cloud.google.com/auth/scopes)):
    - `.../auth/userinfo.email` - See your primary Google Account email address
    - `.../auth/userinfo.profile` - See your personal info, including any
      personal info you've made publicly available
    - `openid` - Associate you with your personal info on Google
 
-10. Save and copy your **Client ID** and **Client Secret**
+2. Save and copy your **Client ID** and **Client Secret**
 
 #### Configure Supabase (Local)
 
@@ -191,7 +195,7 @@ sets cookies on the response object before returning it.
 
 ## Project Structure
 
-```
+```txt
 ├── app/
 │   ├── auth/
 │   │   ├── action.ts          # Server actions for sign in/out
@@ -271,16 +275,20 @@ if (
 1. Push your code to GitHub
 2. Import your repository to [Vercel](https://vercel.com)
 3. Set environment variables in Vercel project settings:
-   ```
+
+   ```txt
    NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_production_publishable_key
    ```
+
 4. Update `app/auth/action.ts` to use your production domain:
+
    ```typescript
    const redirectUrl = process.env.NODE_ENV === "development"
      ? "http://localhost:3000/auth/callback"
      : "https://yourdomain.com/auth/callback"; // Your production domain
    ```
+
 5. Update Google OAuth redirect URIs to include:
    - **Authorized JavaScript origins**: `https://yourdomain.com`
    - **Authorized redirect URIs**:
